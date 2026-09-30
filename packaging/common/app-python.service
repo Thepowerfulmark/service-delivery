@@ -1,0 +1,14 @@
+[Unit]
+Description=Python HTTP service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=-/opt/app-python/config/config.env
+ExecStart=/usr/bin/python3 /opt/app-python/app.py
+Restart=on-failure
+User=nobody
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

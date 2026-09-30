@@ -1,0 +1,12 @@
+[Unit]
+Description=Frontend static site
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/sbin/nginx -c /opt/app-frontend/nginx.conf -g 'daemon off;'
+Restart=on-failure
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

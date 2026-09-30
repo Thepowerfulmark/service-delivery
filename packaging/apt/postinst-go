@@ -1,0 +1,12 @@
+#!/bin/sh
+# Place files on disk. Do not start the service and do not replace an existing config.
+set -eu
+
+if [ ! -f /opt/app-go/config/config.env ]; then
+  cp /opt/app-go/config/config.env.example /opt/app-go/config/config.env
+fi
+chmod 0640 /opt/app-go/config/config.env || true
+
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl daemon-reload || true
+fi

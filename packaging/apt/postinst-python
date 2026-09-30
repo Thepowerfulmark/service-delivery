@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+if [ ! -f /opt/app-python/config/config.env ]; then
+  cp /opt/app-python/config/config.env.example /opt/app-python/config/config.env
+fi
+chmod 0640 /opt/app-python/config/config.env || true
+
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl daemon-reload || true
+fi

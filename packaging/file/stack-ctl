@@ -1,0 +1,83 @@
+#!/bin/sh
+# Install files, enable a unit, or show status.
+# install never starts a service and never replaces an existing config.env.
+set -eu
+
+usage() {
+  echo "usage: stack-ctl install|enable|status [app-go|app-python|app-frontend]" >&2
+  exit 2
+}
+
+[ "$#" -ge 1 ] || usage
+cmd=$1
+name=${2:-}
+root=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+payload=$root/payload
+
+need_name() {
+  case "$name" in
+    app-go|app-python|app-frontend) ;;
+    *) usage ;;
+  esac
+}
+
+install_tree() {
+  src=$1
+  dest=$2
+  mkdir -p "$dest"
+  cp -a "$src/." "$dest/"
+}
+
+install_one() {
+  need_name
+  if [ "$(id -u)" -ne 0 ]; then
+    echo "install needs root" >&2
+    exit 1
+  fi
+  case "$name" in
+    app-go)
+      install_tree "$payload/app-go" /opt/app-go
+      if [ ! -f /opt/app-go/config/config.env ]; then
+        cp /opt/app-go/config/config.env.example /opt/app-go/config/config.env
+      fi
+      cp "$payload/units/app-go.service" /etc/systemd/system/app-go.service
+      ;;
+    app-python)
+      install_tree "$payload/app-python" /opt/app-python
+      if [ ! -f /opt/app-python/config/config.env ]; then
+        cp /opt/app-python/config/config.env.example /opt/app-python/config/config.env
+      fi
+      cp "$payload/units/app-python.service" /etc/systemd/system/app-python.service
+      ;;
+    app-frontend)
+      install_tree "$payload/app-frontend" /opt/app-frontend
+      cp "$payload/units/app-frontend.service" /etc/systemd/system/app-frontend.service
+      ;;
+  esac
+  systemctl daemon-reload
+  echo "installed $name (not started)"
+}
+
+enable_one() {
+  need_name
+  if [ "$(id -u)" -ne 0 ]; then
+    echo "enable needs root" >&2
+    exit 1
+  fi
+  systemctl enable --now "$name"
+}
+
+status_one() {
+  if [ -n "$name" ]; then
+    systemctl status "$name" --no-pager || true
+    return
+  fi
+  systemctl status app-go app-python app-frontend --no-pager || true
+}
+
+case "$cmd" in
+  install) install_one ;;
+  enable) enable_one ;;
+  status) status_one ;;
+  *) usage ;;
+esac

@@ -1,0 +1,14 @@
+[Unit]
+Description=Go HTTP service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=-/opt/app-go/config/config.env
+ExecStart=/opt/app-go/bin/app
+Restart=on-failure
+User=nobody
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
