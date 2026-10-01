@@ -1,6 +1,10 @@
 COMPOSE = docker compose -f compose.yml
 
-.PHONY: up down go python frontend package-apt package-file
+.PHONY: up down go python frontend lint package-apt package-file
+
+lint:
+	shellcheck packaging/apt/build.sh packaging/apt/postinst-go packaging/apt/postinst-python packaging/apt/postinst-frontend packaging/file/build.sh packaging/file/stack-ctl
+	python3 -m py_compile apps/python/app.py
 
 up:
 	$(COMPOSE) up --detach --build

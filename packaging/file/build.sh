@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+root=$(CDPATH='' cd -- "$(dirname "$0")/../.." && pwd)
 version=0.1.0
 dist=$root/dist
 work=$dist/stack-$version

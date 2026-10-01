@@ -25,6 +25,10 @@ make up
 
 Это локальный запуск через Docker Compose. Он не ставит пакеты в `/opt` и не трогает systemd.
 
+## CI
+
+Push и pull request в `main` запускают GitHub Actions: `shellcheck`, синтаксис Python, `go vet`, сборка трёх образов и `make package-apt`. Готовые `.deb` лежат в артефактах job. Тег `v*` публикует эти пакеты в GitHub Release.
+
 ## Пакет APT
 
 ```bash
